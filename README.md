@@ -30,9 +30,17 @@ Links to Data Sources:
 My analysis of Peace Corps resignation data shows an average of 186 resignations per country, with 2019 standing out as the peak year, totaling 4,128 early departures. The most common reason cited for leaving was "no reason listed" followed by family-related reasons, while Morocco recorded the highest number of resignations due to the "amount of work." Of all participating countries, only 14 had zero early terminations, highlighting the widespread nature of early departures. Africa led all regions in both the total number of volunteers and the highest number of resignations, demonstrating the unique challenges and demands of service in that continent. 
 
 <img src="Total Volunteers by Region 2007 to 2020.png" alt="Total Volunteers by Region 2007 to 2020" width="50%">
-<img src="Primary Reasons for Resignation by Country - Ecuador.png" alt="Primary Reasons for Resignation by Country - Ecuador" width="50%">
-<img src="Analysis of Work Related Resignations.png" alt="Analysis of Work Related Resignations" width="50%">
+The visual above displays the total number of Peace Corps volunteers from 2007 to 2020, segmented by region: IAP, EMA, and Africa. The chart highlights the steady increase in volunteers across each region category, with Africa consistently leading in volume total and a notable peak in 2019 for each region.
 
+
+
+<img src="Primary Reasons for Resignation by Country - Ecuador.png" alt="Primary Reasons for Resignation by Country - Ecuador" width="50%">
+This second visual provides an analysis of the most common reasons for quitting based on Country. This particular screenshot captures the Country of Ecuador; we can see that Ecuador, like many other Countries, received many resignations that listed no reason, followed by “unrealistic expectations” and “physical health”.
+
+
+
+<img src="Analysis of Work Related Resignations.png" alt="Analysis of Work Related Resignations" width="50%">
+This final screenshot captures an analysis highlighting countries with the most volunteer resignations due to "amount of work." Morocco leads with 26 resignations, followed by Benin, Albania/Montenegro, Rwanda, and Peru, each with 6. While this demonstration isn't the most visually appealing, this type of analysis can be valuable for service trip planning and demonstrates the analytical power of Malloy.
 
 
 ## Directions on How to Use GitHub Web Editor
