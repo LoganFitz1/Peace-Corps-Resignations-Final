@@ -99,7 +99,7 @@ run: PeaceCore -> {
   Limit: 5
 }
 >>>markdown
-5. Visualization of the most common reasons for resigning overal.
+5. Visualization of the most common reasons for quitting overal.
 >>>malloy
 # bar_chart
 run: PeaceCore -> {
