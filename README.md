@@ -10,7 +10,7 @@ Informative links:
 
 [About the Peace Corps](https://www.peacecorps.gov/what-we-do/our-mission/)
 
-[About the Data Liberation Project](https://www.peacecorps.gov/)
+[About the Data Liberation Project](https://www.data-liberation-project.org/about/)
 
 
 ## Data Overview
