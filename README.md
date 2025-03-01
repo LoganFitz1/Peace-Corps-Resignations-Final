@@ -24,6 +24,8 @@ Links to Data Sources:
 
 [Early Resignation Data 2007-2020](https://www.peacecorps.gov/about-the-agency/policies-and-publications/reports-and-documents/?search_text=Early%20Termination%20Data%20by%20Country%20-%20Annual%20Method%20-%20FY%202007-2020%20%5BCSV%5D)
 
+[Link to Project Repository](https://github.com/LoganFitz1/Peace-Corps-Resignations-Final.git)
+
 
 ## Summary of Findings
 
