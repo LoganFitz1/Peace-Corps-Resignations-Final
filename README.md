@@ -45,12 +45,15 @@ The scatter-plot above is another unique visualization comparing the total numbe
 This visual provides an analysis of the most common reasons for quitting based on Country. This particular screenshot captures the Country of Ecuador; we can see that Ecuador, like many other Countries, received many resignations that listed no reason, followed by “unrealistic expectations” and “physical health”.
 
 <img src="Safety-related Resignations.png" alt=" Bar-chart: Locations With Safety Concerns" width="50%">
+
 Safety is a major concern when traveling internationally. The bar chart above shows Countries with the most number of safety-related volunteer resignations.
 
 <img src="Increase Resignations in Africa.png" alt=" Line-chart: Increae in Resignations in Africa" width="50%">
+
 The line chart above illustrates the trend in total Africa resignations from 2007 to 2020. The data reveals a steady rate of resignations until a sharp increase around 2015, almost doubling to  10,000 before tapering off slightly in 2019. This spike may indicate significant organizational or regional changes that impacted volunteer retention during this period.
 
 <img src="Analysis of Work Related Resignations.png" alt=" Table view: Analysis of Work Related Resignations" width="50%">
+
 This final screenshot captures an analysis highlighting countries with the most volunteer resignations due to "amount of work." Morocco leads with 26 resignations, followed by Benin, Albania/Montenegro, Rwanda, and Peru, each with 6. While this last graphic isn't the most visually appealing, this type of analysis can be valuable for service trip planning and demonstrates the analytical power of Malloy.
 
 
