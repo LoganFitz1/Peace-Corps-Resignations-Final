@@ -57,7 +57,7 @@ Secondary_description_NoNull is coalesce(Secondary_description_left, 'NO REASON 
 
 }
 >>>markdown
-1. What are the top 10 primary reasons for resignations across all Countries?
+Top 10 causes for resignation across all Countries?
 >>>malloy
 run: PeaceCore -> {
     aggregate: Primary_choice is sum(Number_volunteers_resigned)
@@ -67,7 +67,21 @@ run: PeaceCore -> {
     Limit: 10
 }
 >>>markdown
-2. How has the total number of volunteers/trainees by region increased or decreased throughout the years?
+What are the top 5 potentially most dangerous Countries?
+>>>malloy
+# bar_chart
+run: PeaceCore -> {
+  group_by: Country
+
+  aggregate: 
+    `Safety Related Resignations` is sum(Number_volunteers_resigned) 
+      { where: lower(trim(Primary_description_left)) ~ '%safety%'}
+  order_by: `Safety Related Resignations` desc
+  Limit: 5
+
+}
+>>>markdown
+How has the total number of volunteers/trainees by region increased or decreased throughout the years?
 >>>malloy
 # bar_chart
 run: EarlyTerminations -> {
@@ -77,39 +91,7 @@ run: EarlyTerminations -> {
   order_by: `Fiscal Year` asc
 }
 >>>markdown
-3. What is the average number of volunteer resignations per country?
->>>malloy
-
-run: PeaceCore -> {
-  aggregate: 
-    `Total Resignations`,
-    `Total Number of Countries`,
-    avg_resignations_per_country
-
-}
->>>markdown
-4. What are the top 5 countries where "amount of work" is the main reason for leaving; in other words, what countries have potentially the most difficult workload?
->>>malloy
-
-run: PeaceCore -> {
-  group_by: Country
-  aggregate:
-    `'Amount of Work' Related Resignations` is sum(Number_volunteers_resigned) { where: Primary_description_left = 'amount of work' }
-  order_by: `'Amount of Work' Related Resignations` desc
-  Limit: 5
-}
->>>markdown
-5. Visualization of the most common reasons for quitting overal.
->>>malloy
-# bar_chart
-run: PeaceCore -> {
-    aggregate: Number_volunteers_resigned is sum(Number_volunteers_resigned)
-    group_by: 
-    Primary_description_NoNull 
-    limit: 10
-}
->>>markdown
-6. Compare the aggregate number of volunteers who listed no reasons at all, only a primary reason, or both primary and secondary reasons. Which combination is most common for volunteer resignations?
+Compare the aggregate number of volunteers who listed no reasons at all, only a primary reason, or both primary and secondary reasons. Which combination is most common?
 >>>malloy
 
 run: PeaceCore -> {
@@ -132,7 +114,67 @@ run: PeaceCore -> {
     )
 }
 >>>markdown
-7. Use a bar chart within a nest function to vizualize the most common resignation reasons by country.
+Which locations observed the highest early termination rates? Include the years this occured.
+>>>malloy
+run: EarlyTerminations -> {
+  aggregate: highest_ET_Rate is max(`ET Rate`)
+  where: Post != "WORLDWIDE TOTAL"|"EMA TOTAL"|"IAP TOTAL"|"AFRICA TOTAL"
+  group_by: Post, `Fiscal Year`
+  
+  limit: 5
+}
+>>>markdown
+What year had the most early Terminations/Resignations?
+>>>malloy
+run: EarlyTerminations -> {
+  group_by: `Fiscal Year`
+  aggregate: total_resignations is sum(`Total Early Terminations (ET)`)
+  order_by: total_resignations desc
+  limit: 1
+}
+>>>markdown
+What is the average number of volunteer resignations per country?
+>>>malloy
+
+run: PeaceCore -> {
+  aggregate: 
+    `Total Resignations`,
+    `Total Number of Countries`,
+    avg_resignations_per_country
+
+}
+>>>markdown
+What are the top 5 countries where "amount of work" is the main reason for leaving; in other words, what countries have potentially the most difficult workload?
+>>>malloy
+
+run: PeaceCore -> {
+  group_by: Country
+  aggregate:
+    `'Amount of Work' Related Resignations` is sum(Number_volunteers_resigned) { where: Primary_description_left = 'amount of work' }
+  order_by: `'Amount of Work' Related Resignations` desc
+  Limit: 5
+}
+>>>markdown
+Find locations with zero early resignations; what are the post location names, year of count, and the number of volunteers at those locations? 
+>>>malloy
+run: EarlyTerminations -> {
+  where: `ET Rate` = '0.00%'
+  group_by: Post, `Fiscal Year`
+  aggregate: total_volunteers is sum(`Total Volunteers and Trainees`)
+  order_by: total_volunteers desc
+}
+>>>markdown
+Visualize the most common reasons for quitting overal.
+>>>malloy
+# bar_chart
+run: PeaceCore -> {
+    aggregate: Number_volunteers_resigned is sum(Number_volunteers_resigned)
+    group_by: 
+    Primary_description_NoNull 
+    limit: 10
+}
+>>>markdown
+Use a bar chart within a nest function to vizualize the most common reasons for quitting by country.
 >>>malloy
 run: PeaceCore -> {
   group_by: Country
@@ -145,7 +187,7 @@ run: PeaceCore -> {
   }
 }
 >>>markdown
-8. How has the total number of volunteers in JAMAICA changed over the years 2007-2020?
+How has the total number of volunteers in JAMAICA changed over the years 2007-2020?
 >>>malloy
 # line_chart
 run: EarlyTerminations -> {
@@ -155,123 +197,7 @@ run: EarlyTerminations -> {
     order_by: `Fiscal Year`
 }
 >>>markdown
-9. How many rows are in the Peace Corps dataset?
->>>malloy
-run: PeaceCore -> {
-    aggregate: num_rows_PC
-}
->>>markdown
-10. How many rows are in the Early Terminations dataset (the outside source)?
->>>malloy
-run: EarlyTerminations -> {
-    aggregate: num_rows_ET
-
-}
->>>markdown
-11. How many total volunteers resigned according to the Peace Corps dataset?
->>>malloy
-run: PeaceCore -> {
-    aggregate: total_resignations
-}
->>>markdown
-12. How many total volunteers resigned according to the Early Terminations dataset?
->>>malloy
-run: EarlyTerminations -> {
-    aggregate: total_ET_volunteers
-}
->>>markdown
-13. What is the total number of locations according to the Peace Corps dataset?
->>>malloy
-run: PeaceCore -> {
-    aggregate: `Total Number of Countries` is count(Country)
-}
->>>markdown
-14. What is the total number of primary reasons and secondary reason choices available to list for resignation?
->>>malloy
-run: PeaceCore -> {
-    aggregate: primary_options, secondary_options
-    
-}
->>>markdown
-15. Volunteers can select up to two reasons why they decided to resign; what is the total number combinations, primary and secondary, a volunteer is able to create?
-    
-    Include:
-    - No selected Primary or Secondary
-    - 1 primary reason, 0 secondary
-    - 1 primary reason, 1 secondary
->>>malloy
-run: PeaceCore -> {
-aggregate: Combinations_Possible is 1 + primary_options + (primary_options * secondary_options)
-
-}
->>>markdown
-16. What is the total number of resignation combinations used by volunteers in each country?
->>>malloy
-run: PeaceCore -> {
-  aggregate: `Unique Reason Combinations` is count(concat(Primary_description_left, Secondary_description_left))
-  group_by: Country
-  Limit: 100
-}
->>>markdown
-17. What is the total number of volunteers who resigned in each country?
->>>malloy
-run: PeaceCore -> {
-    aggregate: `Number Destinations` is count(Country)
-    `Total Resignations` is sum(Number_volunteers_resigned)
-    nest:  `Resignations by destination` is {
-        group_by: Country
-        aggregate: `resignations` is sum(Number_volunteers_resigned)
-        order_by: `resignations` desc}
-    
-}
->>>markdown
-18. What are the top 15 most used SECONDARY reasons for resigning?
->>>malloy
-
-run: PeaceCore -> {
-    aggregate: Secondary_choice is sum(Number_volunteers_resigned)
-    group_by: 
-    Secondary_description_NoNull, 
-    Secondary_reason_number
-    limit: 15  
-}
->>>markdown
-19. When looking at an aggregate of resignation reasons used by Countries, are there any patterns or common reasons?
->>>malloy
-run: PeaceCore -> {
-    aggregate: `Total Resignations` is sum(Number_volunteers_resigned)
-    group_by: Country
-    Nest: Resignation_Reasons_By_Country is {
-        aggregate: Primary_choice is sum(Number_volunteers_resigned)
-        group_by: Primary_description_NoNull, Primary_reason_number
-        limit: 5
-        --order_by: Secondary_choice
-}
-}
->>>markdown
-20. Find the number of recurring combinations used by volunteers in each Country?
->>>malloy
-run: PeaceCore -> {
-  aggregate: non_unique_combinations is count(concat(Primary_description_left, Secondary_description_left))
-  group_by: Country
-
-}
->>>markdown
-21. Rather than simply listing the number of recuring combinations, can you now display what these combinations are? Include both the primary and secondary reasons. 
->>>malloy
-run: PeaceCore -> {
-  group_by: Country
-  nest: `Common Reasons people resign` is {
-    group_by: Primary_description_NoNull, Secondary_description_NoNull
-    aggregate: Times_Recurred is sum(Number_volunteers_resigned)
-    where: Number_volunteers_resigned > 1
-    order_by: Times_Recurred desc
-    limit: 5
-
-  }
-}
->>>markdown
-22. What are the top 5 most difficult countries to adapt to? 
+What are the top 5 most difficult countries to adapt to? 
 >>>malloy
 run: PeaceCore -> {
   group_by: Country
@@ -281,139 +207,20 @@ run: PeaceCore -> {
   Limit: 5
 }
 >>>markdown
-23. What are the top 5 potentially most dangerous countries?
+Using a scatter plot, identify outlier locaitons where the total number of vounteers is abnormally large.
 >>>malloy
-# bar_chart
-run: PeaceCore -> {
-  group_by: Country
+# scatter_chart
 
-  aggregate: 
-    `Safety Related Resignations` is sum(Number_volunteers_resigned) 
-      { where: lower(trim(Primary_description_left)) ~ '%safety%'}
-  order_by: `Safety Related Resignations` desc
-  Limit: 5
+run: EarlyTerminations -> {
+    
+    group_by: Post 
+    where: Post != "WORLDWIDE TOTAL"|"EMA TOTAL"|"IAP TOTAL"|"AFRICA TOTAL"|"GLOBAL"|"EMA"|"IAP"
 
-}
->>>markdown
-24. Number of resignations that involve missing family, family issues, or being homesick.
->>>malloy
-run: PeaceCore -> {
-  group_by: Primary_description_left
-
-  aggregate: 
- `Number of Resignations` is sum(Number_volunteers_resigned) { where: Primary_description_left = 'Personal/Family'|'Homesick'|'divorce or separation from PCV/T spouse'|'friend(s) or other family responsibility'|'other personal/family related' }
-  order_by: `Number of Resignations` desc
-  Limit: 5
+    aggregate: total_ET is sum(`Total Volunteers and Trainees`)
 
 }
 >>>markdown
-25. Countries in which volunteers resigned due alcohol and drug related problems.
->>>malloy
-run: PeaceCore -> {
-  group_by: Country
-  aggregate: 
-    `Resignation Counts Involving Substance Abuse` is sum(Number_volunteers_resigned) 
-      { where: Primary_description_left = 'alcohol'|'use of illegal substance or misuse of alcohol'|'illegal substance'}
-  order_by: `Resignation Counts Involving Substance Abuse` desc
-  Limit: 10
-  }
->>>markdown
-26. Which countries had the most resignations due to "political" issues?
->>>malloy
-run: PeaceCore -> {
-  group_by: Country
-  aggregate: 
-    `Resignation Counts Political` is sum(Number_volunteers_resigned) 
-      { where: Primary_description_left = 'political/civil unrest'|'political/civil unrest makes work too difficult'}
-  order_by: `Resignation Counts Political` desc
-  Limit: 10
-  }
->>>markdown
-27. Which countries have the highest number of resignations due to language barriers?
->>>malloy
-run: PeaceCore -> {
-  group_by: Country
-  aggregate:
-    `Language Based Resignations` is sum(Number_volunteers_resigned) { where: Primary_description_left = 'language skills' }
-  order_by: `Language Based Resignations` desc
-  Limit: 10
-}
->>>markdown
-28. What are the top 10 reasons people resign from Morocco?
->>>malloy
-run: PeaceCore -> {
-    Where: Country = 'MOROCCO'
-    aggregate: Number_volunteers_resigned is sum(Number_volunteers_resigned)
-    group_by: 
-    Primary_description_NoNull 
-    limit: 10
-}
->>>markdown
-29. What are the top 10 reasons people resign from the Phillipines?
->>>malloy
-run: PeaceCore -> {
-    Where: Country = 'PHILIPPINES'
-    aggregate: Number_volunteers_resigned is sum(Number_volunteers_resigned)
-    group_by: 
-    Primary_description_NoNull 
-    limit: 10
-}
->>>markdown
-30. What are the top 10 reasons people resign from KAZAKHSTAN?
->>>malloy
-# bar_chart
-run: PeaceCore -> {
-    Where: Country = 'KAZAKHSTAN'
-    aggregate: Number_volunteers_resigned is sum(Number_volunteers_resigned)
-    group_by: 
-    Primary_description_NoNull 
-    limit: 10
-}
->>>markdown
-31. What percentage of volunteers listed no reasons at all?
->>>malloy
-run: PeaceCore -> {
-
-  aggregate: 
-    total_resignations
-    `No Reasons Listed %` is round(100 * sum(
-      pick Number_volunteers_resigned
-        when Primary_description_left is null and Secondary_description_left is null
-        else 0
-    ) / total_resignations, 2),
-
-}
->>>markdown
-32. What percentage of volunteer listed a primary reason but not a secondary reason?
->>>malloy
-run: PeaceCore -> {
-
-  aggregate: 
-    total_resignations
-
-    `Only Primary Reason Listed %` is round(100 * sum(
-      pick Number_volunteers_resigned
-        when Primary_description_left is not null and (Secondary_description_left is null or Secondary_description_left = '')
-        else 0
-    ) / total_resignations, 2),
-
-}
->>>markdown
-33. What percentage of volunteers listed both a primary reason and a secondary reason?
->>>malloy
-run: PeaceCore -> {
-
-  aggregate: 
-    total_resignations
-
-    `Both Primary and Secondary Reasons Listed %` is round(100 * sum(
-      pick Number_volunteers_resigned
-        when Primary_description_left is not null and Secondary_description_left is not null and Secondary_description_left != ''
-        else 0
-    ) / total_resignations, 2)
-}
->>>markdown
-34. Which country had the highest rate of resignations where no reason was provided? In other words, where are volunteers most likely to leave abruptly without explanation?
+Which country had the highest rate of resignations where no reason was provided? In other words, where are volunteers most likely to leave abruptly without explanation?
 >>>malloy
 run: PeaceCore -> {
   group_by: Country
@@ -427,52 +234,7 @@ run: PeaceCore -> {
   limit: 1
 }
 >>>markdown
-35. According to the Early Termination data source, what post locations, in the year 2020, had the highest total number of volunteers and trainees?
->>>malloy
-run: EarlyTerminations -> {
-  where: `Fiscal Year` = 2020 and Post != 'GLOBAL'
-  group_by: Post 
-  aggregate: 
-    `Total Volunteers` is sum(`Total Volunteers and Trainees`)
-}
->>>markdown
-36. What is the total aggregate of EarlyTermination volunteers from 2007 to 2020?
->>>malloy
-run: EarlyTerminations -> {
-  aggregate: total_early_terminations is sum(`Total Early Terminations (ET)`)
-}
->>>markdown
-37. Which posts observed the highest early termination rates? Include the years this occured.
->>>malloy
-run: EarlyTerminations -> {
-  aggregate: highest_ET_Rate is max(`ET Rate`)
-  where: Post != "WORLDWIDE TOTAL"|"EMA TOTAL"|"IAP TOTAL"|"AFRICA TOTAL"
-  group_by: Post, `Fiscal Year`
-  
-  limit: 5
-}
->>>markdown
-38. The Early Termination dataset reports Peru having a considerably high Early Termination rate in 2018; What are the reasons why volunteers resign early in Peru? 
->>>malloy
-
-run: PeaceCore -> {
-    Where: Country = 'PERU'
-    aggregate: Number_volunteers_resigned is sum(Number_volunteers_resigned)
-    group_by: 
-    Primary_description_NoNull 
-    limit: 10
-}
->>>markdown
-39. Which year had the most early Terminations/Resignations?
->>>malloy
-run: EarlyTerminations -> {
-  group_by: `Fiscal Year`
-  aggregate: total_resignations is sum(`Total Early Terminations (ET)`)
-  order_by: total_resignations desc
-  limit: 1
-}
->>>markdown
-40. Of the 3 regions [EMA, IAP, AFRICA], which region had the most number of locations in 2015? What are the names of these locations? 
+Of the 3 regions [EMA, IAP, AFRICA], which region had the most number of locations in 2015? What are the names of these locations? 
 
     EMA = Europe, Mediterranean, and Asia
 
@@ -491,16 +253,261 @@ run: EarlyTerminations -> {
   }
 }
 >>>markdown
-41. Find locations that had zero early resignations; what are the post location names, year of count, and the number of volunteers at those location? 
+What locations have the highest number of resignations due to language barriers?
 >>>malloy
-run: EarlyTerminations -> {
-  where: `ET Rate` = '0.00%'
-  group_by: Post, `Fiscal Year`
-  aggregate: total_volunteers is sum(`Total Volunteers and Trainees`)
-  order_by: total_volunteers desc
+run: PeaceCore -> {
+  group_by: Country
+  aggregate:
+    `Language Based Resignations` is sum(Number_volunteers_resigned) { where: Primary_description_left = 'language skills' }
+  order_by: `Language Based Resignations` desc
+  Limit: 10
 }
 >>>markdown
-42. For the most recent year of data, visualize and rank locations with the most early terminations.
+How many total volunteers resigned according to the Peace Corps dataset?
+>>>malloy
+run: PeaceCore -> {
+    aggregate: total_resignations
+}
+>>>markdown
+How many total volunteers resigned according to the EarlyTermination dataset?
+>>>malloy
+run: EarlyTerminations -> {
+  aggregate: total_early_terminations is sum(`Total Early Terminations (ET)`)
+}
+>>>markdown
+How many rows are in the Peace Corps dataset?
+>>>malloy
+run: PeaceCore -> {
+    aggregate: num_rows_PC
+}
+>>>markdown
+How many rows are in the Early Terminations dataset (the outside source)?
+>>>malloy
+run: EarlyTerminations -> {
+    aggregate: num_rows_ET
+
+}
+>>>markdown
+What is the total number of locations according to the Peace Corps dataset?
+>>>malloy
+run: PeaceCore -> {
+    aggregate: `Total Number of Countries` is count(Country)
+}
+>>>markdown
+What is the total number of primary reason and secondary reason choices available to list for resignation?
+>>>malloy
+run: PeaceCore -> {
+    aggregate: primary_options, secondary_options
+    
+}
+>>>markdown
+Volunteers can select up to two reasons why they decided to resign; what is the total number combinations, primary and secondary, a volunteer is able to create?
+    
+    Include:
+    - No selected Primary or Secondary
+    - 1 primary reason, 0 secondary
+    - 1 primary reason, 1 secondary
+>>>malloy
+run: PeaceCore -> {
+aggregate: Combinations_Possible is 1 + primary_options + (primary_options * secondary_options)
+
+}
+>>>markdown
+What is the total number of resignation combinations used by volunteers in each country?
+>>>malloy
+run: PeaceCore -> {
+  aggregate: `Unique Reason Combinations` is count(concat(Primary_description_left, Secondary_description_left))
+  group_by: Country
+  Limit: 100
+}
+>>>markdown
+What is the total number of volunteers who resigned in each country?
+>>>malloy
+run: PeaceCore -> {
+    aggregate: `Number Destinations` is count(Country)
+    `Total Resignations` is sum(Number_volunteers_resigned)
+    nest:  `Resignations by destination` is {
+        group_by: Country
+        aggregate: `resignations` is sum(Number_volunteers_resigned)
+        order_by: `resignations` desc}
+    
+}
+>>>markdown
+What are the top 15 most used SECONDARY reasons for resigning?
+>>>malloy
+
+run: PeaceCore -> {
+    aggregate: Secondary_choice is sum(Number_volunteers_resigned)
+    group_by: 
+    Secondary_description_NoNull, 
+    Secondary_reason_number
+    limit: 15  
+}
+>>>markdown
+When looking at an aggregate of resignation reasons used by Countries, are there any patterns or common reasons?
+>>>malloy
+run: PeaceCore -> {
+    aggregate: `Total Resignations` is sum(Number_volunteers_resigned)
+    group_by: Country
+    Nest: Resignation_Reasons_By_Country is {
+        aggregate: Primary_choice is sum(Number_volunteers_resigned)
+        group_by: Primary_description_NoNull, Primary_reason_number
+        limit: 5
+        
+}
+}
+>>>markdown
+Find the number of recurring combinations used by volunteers in each Country?
+>>>malloy
+run: PeaceCore -> {
+  aggregate: non_unique_combinations is count(concat(Primary_description_left, Secondary_description_left))
+  group_by: Country
+
+}
+>>>markdown
+Rather than simply listing the number of recuring combinations, can you now display what these combinations are? Include both the primary and secondary reasons. 
+>>>malloy
+run: PeaceCore -> {
+  group_by: Country
+  nest: `Common Reasons people resign` is {
+    group_by: Primary_description_NoNull, Secondary_description_NoNull
+    aggregate: Times_Recurred is sum(Number_volunteers_resigned)
+    where: Number_volunteers_resigned > 1
+    order_by: Times_Recurred desc
+    limit: 5
+
+  }
+}
+>>>markdown
+Number of resignations that involve missing family, family issues, or being homesick.
+>>>malloy
+run: PeaceCore -> {
+  group_by: Primary_description_left
+
+  aggregate: 
+ `Number of Resignations` is sum(Number_volunteers_resigned) { where: Primary_description_left = 'Personal/Family'|'Homesick'|'divorce or separation from PCV/T spouse'|'friend(s) or other family responsibility'|'other personal/family related' }
+  order_by: `Number of Resignations` desc
+  Limit: 5
+
+}
+>>>markdown
+Countries having volunteers resign due alcohol and drug related problems.
+>>>malloy
+run: PeaceCore -> {
+  group_by: Country
+  aggregate: 
+    `Resignation Counts Involving Substance Abuse` is sum(Number_volunteers_resigned) 
+      { where: Primary_description_left = 'alcohol'|'use of illegal substance or misuse of alcohol'|'illegal substance'}
+  order_by: `Resignation Counts Involving Substance Abuse` desc
+  Limit: 10
+  }
+>>>markdown
+Which Countries had the most resignations due to "political" issues?
+>>>malloy
+run: PeaceCore -> {
+  group_by: Country
+  aggregate: 
+    `Resignation Counts Political` is sum(Number_volunteers_resigned) 
+      { where: Primary_description_left = 'political/civil unrest'|'political/civil unrest makes work too difficult'}
+  order_by: `Resignation Counts Political` desc
+  Limit: 10
+  }
+>>>markdown
+What are the top 10 reasons people resign from Morocco?
+>>>malloy
+run: PeaceCore -> {
+    Where: Country = 'MOROCCO'
+    aggregate: Number_volunteers_resigned is sum(Number_volunteers_resigned)
+    group_by: 
+    Primary_description_NoNull 
+    limit: 10
+}
+>>>markdown
+What are the top 10 reasons people resign from the Phillipines?
+>>>malloy
+run: PeaceCore -> {
+    Where: Country = 'PHILIPPINES'
+    aggregate: Number_volunteers_resigned is sum(Number_volunteers_resigned)
+    group_by: 
+    Primary_description_NoNull 
+    limit: 10
+}
+>>>markdown
+What are the top 10 reasons people resign from KAZAKHSTAN?
+>>>malloy
+# bar_chart
+run: PeaceCore -> {
+    Where: Country = 'KAZAKHSTAN'
+    aggregate: Number_volunteers_resigned is sum(Number_volunteers_resigned)
+    group_by: 
+    Primary_description_NoNull 
+    limit: 10
+}
+>>>markdown
+What percentage of volunteers listed no reasons at all?
+>>>malloy
+run: PeaceCore -> {
+
+  aggregate: 
+    total_resignations
+    `No Reasons Listed %` is round(100 * sum(
+      pick Number_volunteers_resigned
+        when Primary_description_left is null and Secondary_description_left is null
+        else 0
+    ) / total_resignations, 2),
+
+}
+>>>markdown
+What percentage of volunteer listed a primary reason but not a secondary reason?
+>>>malloy
+run: PeaceCore -> {
+
+  aggregate: 
+    total_resignations
+
+    `Only Primary Reason Listed %` is round(100 * sum(
+      pick Number_volunteers_resigned
+        when Primary_description_left is not null and (Secondary_description_left is null or Secondary_description_left = '')
+        else 0
+    ) / total_resignations, 2),
+
+}
+>>>markdown
+What percentage of volunteers listed both a primary reason and a secondary reason?
+>>>malloy
+run: PeaceCore -> {
+
+  aggregate: 
+    total_resignations
+
+    `Both Primary and Secondary Reasons Listed %` is round(100 * sum(
+      pick Number_volunteers_resigned
+        when Primary_description_left is not null and Secondary_description_left is not null and Secondary_description_left != ''
+        else 0
+    ) / total_resignations, 2)
+}
+>>>markdown
+According to the Early Termination data source, what post locations, in the year 2020, had the highest total number of volunteers and trainees?
+>>>malloy
+run: EarlyTerminations -> {
+  where: `Fiscal Year` = 2020 and Post != 'GLOBAL'
+  group_by: Post 
+  aggregate: 
+    `Total Volunteers` is sum(`Total Volunteers and Trainees`)
+}
+>>>markdown
+The Early Termination dataset reports Peru having a considerably high Early Termination rate in 2018; What are the reasons why volunteers resign early in Peru? 
+>>>malloy
+
+run: PeaceCore -> {
+    Where: Country = 'PERU'
+    aggregate: Number_volunteers_resigned is sum(Number_volunteers_resigned)
+    group_by: 
+    Primary_description_NoNull 
+    limit: 10
+}
+>>>markdown
+For the most recent year of data, visualize and rank locations with the most early terminations.
 >>>malloy
 
 # bar_chart
@@ -512,7 +519,7 @@ run: EarlyTerminations -> {
   order_by: total_resignations desc
 }
 >>>markdown
-43. What is another way to visualize the increase in total number of volunteers in Africa Regions throughout the years?
+What is another way to visualize the increase in total number of volunteers in Africa Regions throughout the years?
 >>>malloy
 # line_chart
 run: EarlyTerminations -> {
@@ -522,23 +529,10 @@ run: EarlyTerminations -> {
   order_by: `Fiscal Year` asc
 }
 >>>markdown
-44. What locations in the Peace Corps dataset are not listed in the Early Terminations dataset?
+What locations in the Peace Corps dataset are not listed in the Early Terminations dataset?
 >>>malloy
 run: PeaceCore -> {
     where: Country != EarlyTerminations.Post
     group_by: Missing_Locations is Country
-
-}
->>>markdown
-45. Using a scatter plot, identify any outlier locaitons where the total number of vounteers is abnormally large.
->>>malloy
-# scatter_chart
-
-run: EarlyTerminations -> {
-    
-    group_by: Post 
-    where: Post != "WORLDWIDE TOTAL"|"EMA TOTAL"|"IAP TOTAL"|"AFRICA TOTAL"|"GLOBAL"|"EMA"|"IAP"
-
-    aggregate: total_ET is sum(`Total Volunteers and Trainees`)
 
 }
